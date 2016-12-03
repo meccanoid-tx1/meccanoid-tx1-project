@@ -136,6 +136,10 @@ add_executable(meccanoid_obstacle_avoidance_node
   src/meccanoid_obstacle_avoidance/meccanoid_obstacle_avoidance_node.cpp src/meccanoid_map/map.cpp src/meccanoid_positioning/marvelmind_hedge.c
 )
 
+add_executable(meccanoid_position_visualization_node
+  src/meccanoid_positioning/subscriber_test.cpp src/meccanoid_positioning/marvelmind_hedge.c
+)
+
 ### EXECUTABLE DEPENDENCIES
 add_dependencies(meccanoid_user_interface_node 
   ${${PROJECT_NAME}_EXPORTED_TARGETS} 
@@ -176,6 +180,11 @@ add_dependencies(meccanoid_obstacle_avoidance_node
   ${catkin_EXPORTED_TARGETS}
 )
 
+add_dependencies(meccanoid_position_visualization_node
+  ${${PROJECT_NAME}_EXPORTED_TARGETS} 
+  ${catkin_EXPORTED_TARGETS}
+)
+
 ### TARGET LINKS
 target_link_libraries(meccanoid_user_interface_node
    ${catkin_LIBRARIES}
@@ -210,6 +219,11 @@ target_link_libraries(meccanoid_obstacle_avoidance_node
  ${catkin_LIBRARIES}
  ${OpenCV_LIBRARIES}
 )
+
+target_link_libraries(meccanoid_position_visualization_node
+ ${catkin_LIBRARIES}
+)
+
 
 #---------------------------------------------------------#
 #                         Install                         #
