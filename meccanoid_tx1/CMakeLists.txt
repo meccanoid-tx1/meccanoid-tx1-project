@@ -63,6 +63,7 @@ catkin_package(
 	meccanoid_face_detection
 	meccanoid_path_planning
 	meccanoid_obstacle_avoidance
+	meccanoid_teleop
   CATKIN_DEPENDS 
   cv_bridge 
   image_transport 
@@ -133,11 +134,15 @@ add_executable(meccanoid_path_planning_node
 )
 
 add_executable(meccanoid_obstacle_avoidance_node
-  src/meccanoid_obstacle_avoidance/meccanoid_obstacle_avoidance_node.cpp src/meccanoid_map/map.cpp src/meccanoid_positioning/marvelmind_hedge.c
+  src/meccanoid_obstacle_avoidance/meccanoid_obstacle_avoidance_node.cpp
 )
 
 add_executable(meccanoid_position_visualization_node
   src/meccanoid_positioning/subscriber_test.cpp src/meccanoid_positioning/marvelmind_hedge.c
+)
+
+add_executable(meccanoid_teleop_node
+  src/meccanoid_teleop/meccanoid_teleop_node.cpp
 )
 
 ### EXECUTABLE DEPENDENCIES
@@ -185,6 +190,11 @@ add_dependencies(meccanoid_position_visualization_node
   ${catkin_EXPORTED_TARGETS}
 )
 
+add_dependencies(meccanoid_teleop_node
+  ${${PROJECT_NAME}_EXPORTED_TARGETS} 
+  ${catkin_EXPORTED_TARGETS}
+)
+
 ### TARGET LINKS
 target_link_libraries(meccanoid_user_interface_node
    ${catkin_LIBRARIES}
@@ -221,6 +231,10 @@ target_link_libraries(meccanoid_obstacle_avoidance_node
 )
 
 target_link_libraries(meccanoid_position_visualization_node
+ ${catkin_LIBRARIES}
+)
+
+target_link_libraries(meccanoid_teleop_node
  ${catkin_LIBRARIES}
 )
 

@@ -9,7 +9,7 @@
 
 #include "std_msgs/MultiArrayLayout.h"
 #include "std_msgs/MultiArrayDimension.h"
-#include "std_msgs/UInt8MultiArray.h"
+#include "std_msgs/Int8MultiArray.h"
 
 
 class MeccanoidTeleop {
@@ -50,12 +50,12 @@ class MeccanoidTeleop {
 	
 	private:
 	ros::Publisher keyPublisher;
-    uint8_t _l_dir;
-    uint8_t _r_dir;
-    uint8_t _l_break;
-    uint8_t _r_break;
-    uint8_t _l_speed;
-    uint8_t _r_speed;
+    int8_t _l_dir;
+    int8_t _r_dir;
+    int8_t _l_break;
+    int8_t _r_break;
+    int8_t _l_speed;
+    int8_t _r_speed;
 
     int getkey(){
         int character;
@@ -80,10 +80,10 @@ class MeccanoidTeleop {
         return character;
     }
 
-    std_msgs::UInt8MultiArray message(uint8_t l_dir, uint8_t r_dir,
-                                        uint8_t l_break, uint8_t r_break, 
-                                        uint8_t l_speed, uint8_t r_speed){
-        std_msgs::UInt8MultiArray msg;
+    std_msgs::Int8MultiArray message(int8_t l_dir, int8_t r_dir,
+                                        int8_t l_break, int8_t r_break, 
+                                        int8_t l_speed, int8_t r_speed){
+        std_msgs::Int8MultiArray msg;
         msg.data.clear();
         msg.data.push_back(l_dir);
         _l_dir = l_dir;
@@ -136,7 +136,7 @@ int main(int argc, char **argv){
     // init ros
     ros::init(argc, argv, "meccanoid_teleop");
     ros::NodeHandle nodeHandle;
-    ros::Publisher keyPublisher = nodeHandle.advertise<std_msgs::UInt8MultiArray>("meccanoid_teleop", 10);
+    ros::Publisher keyPublisher = nodeHandle.advertise<std_msgs::Int8MultiArray>("motor_control_signal", 10);
     ros::Rate loop_rate(10);
 
     MeccanoidTeleop *teleop = new MeccanoidTeleop(keyPublisher);

@@ -6,6 +6,8 @@
 #include <meccanoid_tx1/hedge_pos.h>
 
 #include <stdint.h>
+#include <stdlib.h>
+#include <tgmath.h>
 
 #include <std_msgs/MultiArrayLayout.h>
 #include <std_msgs/MultiArrayDimension.h>
@@ -24,6 +26,12 @@ class MeccanoidPathPlanner{
 	arduinoMotorControlPublisher = pub2;
         isNavigating.data = false;
         map = new meccanoid_tx1::Map(-1);
+	heading = 0;
+	calibrationCount = 0;
+	//for calibration
+	isCalibrating = true;
+	validHeading = false;
+	calibrationTime = 200000; // 200ms
     };
 
     /*
@@ -38,10 +46,11 @@ class MeccanoidPathPlanner{
     */
     void mapCallback(const meccanoid_tx1::meccanoid_mapConstPtr &msg){
         map_msg = *msg;
+	/*
         if(isNavigating.data){
             //TODO: plan path -> send motor commands
             motorControlPublisher.publish(generateMotorControlMsg());
-        }
+        }*/
     }
 
     /*
@@ -49,12 +58,27 @@ class MeccanoidPathPlanner{
     */
     void positionCallback(const meccanoid_tx1::hedge_posConstPtr &msg){
         pos_msg = *msg;
-	ROS_INFO("recieved position callback");
-	publishMotorControlSignal();
-        if(isNavigating.data){
-            //TODO: plan path -> send motor commands
-            motorControlPublisher.publish(generateMotorControlMsg());
-        }
+	ROS_INFO("path planning callback: heading = %f, x=%.4f, y=%.4f",heading,pos_msg.x_m,pos_msg.y_m);
+
+	if(isCalibrating){
+		start_x = pos_msg.x_m;
+		start_y = pos_msg.y_m;
+		arduinoMotorControlPublisher.publish(forward());
+		isCalibrating = false;
+	}
+		
+	if(validHeading){
+		// run code as intended
+	}else{
+		if(calibrationCount > 20){
+			arduinoMotorControlPublisher.publish(stop());
+			float dx = pos_msg.x_m - start_x;
+			float dy = pos_msg.y_m - start_y;
+			calculateHeading(dx,dy);
+			validHeading = true;
+		}
+		calibrationCount++;	
+	}
     }
 
 
@@ -65,16 +89,115 @@ class MeccanoidPathPlanner{
     meccanoid_tx1::Map* map;
     meccanoid_tx1::meccanoid_map map_msg;
     meccanoid_tx1::hedge_pos pos_msg;
+    float heading;
+    //for heading calibration
+    int calibrationCount;
+    bool isCalibrating;
+    bool validHeading;
+    float start_x,start_y;
+    float calibrationTime;
 
+
+	void calculateHeading(float dx, float dy){
+		heading = atanf(dy/dx);
+	}
+    
     /*
     / Generate motor control message
     */
+/*
     meccanoid_tx1::meccanoid_motor_control generateMotorControlMsg(){
         meccanoid_tx1::meccanoid_motor_control motor_control_msg;
         //TODO: generate appropriate motor control msg;
         return motor_control_msg;
     }
+*/
 
+	// generate motor control message for driving forward
+	std_msgs::Int8MultiArray forward(){
+		// message structure
+		std_msgs::Int8MultiArray motor_control_signal_msg;
+		motor_control_signal_msg.data.clear();
+
+		// populate message structure by pushing in order
+		motor_control_signal_msg.data.push_back(1);
+		motor_control_signal_msg.data.push_back(1);
+		motor_control_signal_msg.data.push_back(0);
+		motor_control_signal_msg.data.push_back(0);
+		motor_control_signal_msg.data.push_back(255);
+		motor_control_signal_msg.data.push_back(255);
+
+		return motor_control_signal_msg;
+	}
+
+	// generate motor control message for driving backward
+	std_msgs::Int8MultiArray backward(){
+		// message structure
+		std_msgs::Int8MultiArray motor_control_signal_msg;
+		motor_control_signal_msg.data.clear();
+
+		// populate message structure by pushing in order
+		motor_control_signal_msg.data.push_back(0);
+		motor_control_signal_msg.data.push_back(0);
+		motor_control_signal_msg.data.push_back(0);
+		motor_control_signal_msg.data.push_back(0);
+		motor_control_signal_msg.data.push_back(255);
+		motor_control_signal_msg.data.push_back(255);
+
+		return motor_control_signal_msg;
+	}
+
+	// generate motor control message for turning left
+	std_msgs::Int8MultiArray turnLeft(){
+		// message structure
+		std_msgs::Int8MultiArray motor_control_signal_msg;
+		motor_control_signal_msg.data.clear();
+
+		// populate message structure by pushing in order
+		motor_control_signal_msg.data.push_back(1);
+		motor_control_signal_msg.data.push_back(1);
+		motor_control_signal_msg.data.push_back(0);
+		motor_control_signal_msg.data.push_back(0);
+		motor_control_signal_msg.data.push_back(255);
+		motor_control_signal_msg.data.push_back(55);
+
+		return motor_control_signal_msg;
+	}
+
+	// generate motor control message for turning right
+	std_msgs::Int8MultiArray turnRight(){
+		// message structure
+		std_msgs::Int8MultiArray motor_control_signal_msg;
+		motor_control_signal_msg.data.clear();
+
+		// populate message structure by pushing in order
+		motor_control_signal_msg.data.push_back(1);
+		motor_control_signal_msg.data.push_back(1);
+		motor_control_signal_msg.data.push_back(0);
+		motor_control_signal_msg.data.push_back(0);
+		motor_control_signal_msg.data.push_back(55);
+		motor_control_signal_msg.data.push_back(255);
+
+		return motor_control_signal_msg;
+	}
+
+	// generate motor control message for stopping
+	std_msgs::Int8MultiArray stop(){
+		// message structure
+		std_msgs::Int8MultiArray motor_control_signal_msg;
+		motor_control_signal_msg.data.clear();
+
+		// populate message structure by pushing in order
+		motor_control_signal_msg.data.push_back(1);
+		motor_control_signal_msg.data.push_back(1);
+		motor_control_signal_msg.data.push_back(1);
+		motor_control_signal_msg.data.push_back(1);
+		motor_control_signal_msg.data.push_back(0);
+		motor_control_signal_msg.data.push_back(0);
+
+		return motor_control_signal_msg;
+	}
+    
 
     /*
     / Generate motor control signal
