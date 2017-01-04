@@ -2,7 +2,7 @@
 
 ros packages for the meccanoid-tx1
 
-![Screenshot](ros-packages-basic-idea.png)
+![Screenshot](rosgraph.png)
 
 
 ## Install scripts
