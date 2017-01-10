@@ -97,7 +97,10 @@ sed -i '$s/$/ usbcore.autosuspend=-1/' /boot/extlinux/extlinux.conf
 bash -c 'echo -1 > /sys/module/usbcore/parameters/autosuspend'
 ```
 you may sometimes may not be able to connect to the video feed of the kinect in that case you may have to install PrimeSense Sensor Module for OpenNI from
-```
+
+``````bash
+#!/bin/bash
+
 # Clone Repository
 git clone https://github.com/avin2/SensorKinect
 
