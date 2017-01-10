@@ -54,7 +54,7 @@ cv::Mat threshold_output;
 std::vector<std::vector<cv::Point> > contours;
 std::vector<cv::Vec4i> hierarchy;
 
-// Canny Edge Detector
+// Canny Edge Detector from OpenCV used works only on black and white images must be noted to avoid random errors
 void CannyThreshold(int, void *)
 {   
   
@@ -64,7 +64,7 @@ void CannyThreshold(int, void *)
     cv::bitwise_not ( src_blur, src_blur );
    // detected_edges = cv::Scalar::all(0);
     src_blur.convertTo(detected_edges, CV_8U);
-    cvtColor(detected_edges, detected_edges, CV_BGR2GRAY);
+    cvtColor(detected_edges, detected_edges, CV_BGR2GRAY);// Convert to black and white
     Canny(detected_edges, detected_edges, lowThreshold, lowThreshold * ratio, kernel_size);
   // Canny(detected_edges, detected_edges, lowThreshold, lowThreshold * ratio, kernel_size);
     /// Using Canny's output as a mask, we display our result
@@ -73,7 +73,7 @@ void CannyThreshold(int, void *)
     cvtColor(dst, dst, CV_BGR2GRAY);
 }
 
-// Contours
+// Contours are created using the edge detection and bounding boxes are created around the contours to detect the obstacles
 void Contourmake(int, void *)
 {
     cv::findContours(dst, contours, hierarchy, RETR_TREE, CHAIN_APPROX_SIMPLE, cv::Point(0, 0));
@@ -103,7 +103,7 @@ void Contourmake(int, void *)
 		intersection = 0;
 		bool break_var = false;
 
-//left Scan
+//left Scan (Scan from the centre pixel to the left trying to find the closest opening possible to fit)
 	for (int i = 320-(pixel_robot_width / 2); i >= 0 && !break_var; i--)
 	{
 	intersection = 0;
@@ -111,7 +111,7 @@ void Contourmake(int, void *)
 
 		for (int j = 0; j < contours.size(); j++)
     {
-	Rect r3 = robot_box & boundRect[j];
+	Rect r3 = robot_box & boundRect[j]; // Checking the intersection of the robot bounding box with the obstacle bounding boxes
 	if (r3.area() > 0)
 	{
 	    intersection = 2;
@@ -129,7 +129,7 @@ void Contourmake(int, void *)
     break_var = true;
     }
 	}
-//Right Scan
+//Right Scan (Scan from the centre pixel to the right trying to find the closest opening possible to fit)
 for (int i = 320-(pixel_robot_width / 2); i <= (640-pixel_robot_width) && !break_var; i++)
 	{
 	intersection = 0;
@@ -137,7 +137,7 @@ for (int i = 320-(pixel_robot_width / 2); i <= (640-pixel_robot_width) && !break
 
 	for (int j = 0; j < contours.size(); j++)
     {
-	Rect r3 = robot_box & boundRect[j];
+	Rect r3 = robot_box & boundRect[j];  // Checking the intersection of the robot bounding box with the obstacle bounding boxes
 	if (r3.area() > 0)
 	{
 	    intersection = 2;
@@ -159,7 +159,7 @@ for (int i = 320-(pixel_robot_width / 2); i <= (640-pixel_robot_width) && !break
 
 }
 
-// callback
+// Function to detect closest object
 void imCallback(const sensor_msgs::ImageConstPtr &msg)
 {
     try
@@ -194,17 +194,17 @@ void imCallback(const sensor_msgs::ImageConstPtr &msg)
 	    for (int x = 1; x < (image.cols-2); x++)
 	    {
 		int depth_filt=0;
-		   for(int i=0; i<3; i++) //Depth Filter
+		   for(int i=0; i<3; i++) //Depth Filter scans the image in large pixel boxes of 3 X 3 to find the maximum depth pixel among the 9 pixels. This avoids faulty reading due to one or more pixel giving faulty low readings
 		   { 
 			   for(int j=0; j<3; j++)
 			   {
 				   depth = image.at<uint16_t>((x+i), (y+j));
 				   if (depth > depth_filt)
-			       depth_filt = depth;
+			       depth_filt = depth; //Choose the lowest depth value to find the closest obstacle
 		     
 			   }
 		   }
-               if (x != 480 && x < 480) //dead Pixels
+               if (x != 480 && x < 480) //dead Pixels (All Pixels are not functioning properly in the kinect hence by running an approximate pixels were found to be dead scan all if new kinect is used)
 {
 		   if (depth_filt < (depthmin) && depth_filt > 400)
 		    {
@@ -224,7 +224,7 @@ void imCallback(const sensor_msgs::ImageConstPtr &msg)
 		if (depth >= (depthmin - obs_depth) && depth <= (depthmin + obs_depth))
 		{
 		    pros.at<cv::Vec3b>(i, j)[0] = 255;
-            pros2.at<cv::Vec3b>(i, j)[0] = 255;
+            pros2.at<cv::Vec3b>(i, j)[0] = 255; //Colours the closest pixel found and all pixels within the obstacle width to blue
 		}
 	    }
 	}
@@ -233,7 +233,7 @@ void imCallback(const sensor_msgs::ImageConstPtr &msg)
 	cv::bitwise_not(src, src);
 	cv::imshow("Processed Image", pros);
 	cv::waitKey(30);
-	std::cout << "depth: " << depthmin << " location: " << depthx << " X " << depthy << std::endl;
+	std::cout << "depth: " << depthmin << " location: " << depthx << " X " << depthy << std::endl; //Print the values of the closest depth and it's pixel position
 	/// Create a matrix of the same type and size as src (for dst)
 	dst.create(src.size(), src.type());	
 	contours.clear();
