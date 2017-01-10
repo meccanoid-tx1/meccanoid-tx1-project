@@ -96,6 +96,19 @@ sed -i '$s/$/ usbcore.autosuspend=-1/' /boot/extlinux/extlinux.conf
 # Disable usb auto suspend for the current session 
 bash -c 'echo -1 > /sys/module/usbcore/parameters/autosuspend'
 ```
+you may sometimes may not be able to connect to the video feed of the kinect in that case you may have to install PrimeSense Sensor Module for OpenNI from
+```
+# Clone Repository
+git clone https://github.com/avin2/SensorKinect
+
+# Go into the Directory of Driver Install
+cd Bin
+
+#Install Driver
+tar xjf SensorKinect093-Bin-Linux-x64-v5.1.2.1.tar.bz2
+cd Sensor-Bin-Linux-x64-v5.1.2.1
+./install.sh
+```
 
 #### ROS Kinect node
 
