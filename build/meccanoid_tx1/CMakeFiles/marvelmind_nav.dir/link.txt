@@ -1,0 +1,1 @@
+/usr/bin/cc  -fPIC   -shared -Wl,-soname,libmarvelmind_nav.so -o /home/jesper/Documents/Programming/Kandidat/devel/lib/libmarvelmind_nav.so CMakeFiles/marvelmind_nav.dir/src/meccanoid_positioning/marvelmind_hedge.c.o 

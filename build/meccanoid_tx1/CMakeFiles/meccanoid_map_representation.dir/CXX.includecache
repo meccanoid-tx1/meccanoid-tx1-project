@@ -1,0 +1,14 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/jesper/Documents/Programming/Kandidat/src/meccanoid_tx1/include/meccanoid_map/map.hpp
+
+/home/jesper/Documents/Programming/Kandidat/src/meccanoid_tx1/src/meccanoid_map/map.cpp
+meccanoid_map/map.hpp
+/home/jesper/Documents/Programming/Kandidat/src/meccanoid_tx1/src/meccanoid_map/meccanoid_map/map.hpp
+

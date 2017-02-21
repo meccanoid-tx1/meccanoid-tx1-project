@@ -1,0 +1,38 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/jesper/Documents/Programming/Kandidat/src/meccanoid_tx1/include/meccanoid_positioning/marvelmind_hedge.h
+stdint.h
+-
+stdbool.h
+-
+stddef.h
+-
+
+/home/jesper/Documents/Programming/Kandidat/src/meccanoid_tx1/src/meccanoid_positioning/marvelmind_hedge.c
+stdlib.h
+-
+stdio.h
+-
+string.h
+-
+windows.h
+-
+process.h
+-
+unistd.h
+-
+termios.h
+-
+fcntl.h
+-
+pthread.h
+-
+meccanoid_positioning/marvelmind_hedge.h
+/home/jesper/Documents/Programming/Kandidat/src/meccanoid_tx1/src/meccanoid_positioning/meccanoid_positioning/marvelmind_hedge.h
+

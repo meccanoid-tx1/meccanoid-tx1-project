@@ -1,0 +1,8 @@
+prefix=/home/jesper/Documents/Programming/Kandidat/install
+
+Name: meccanoid_tx1
+Description: Description of meccanoid_tx1
+Version: 0.0.1
+Cflags: -I/home/jesper/Documents/Programming/Kandidat/install/include
+Libs: -L/home/jesper/Documents/Programming/Kandidat/install/lib -lmeccanoid_map -lmeccanoid_positioning -lmeccanoid_face_detection -lmeccanoid_path_planning -lmeccanoid_obstacle_avoidance -lmeccanoid_teleop
+Requires: cv_bridge image_transport roscpp message_runtime sensor_msgs std_msgs
